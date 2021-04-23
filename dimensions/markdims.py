@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from imutils.perspective import order_points
 import logging
+import time
 
 logging.basicConfig(format='%(asctime)s  %(levelname)-10s %(message)s', datefmt="%Y-%m-%d-%H-%M-%S",
                     level=logging.INFO)
@@ -71,5 +72,46 @@ def get_limit_points(frame):
   logging.info(f"result {real_limits}")
 
   return real_limits
+
+
+def get_perspective_matrix(w, d):
+  '''
+  Parameters:
+  w - width
+  d - depth
+  Given the width and the depth of the viewing area, get the perspective transform matrix
+  '''  
+
+  cap = cv2.VideoCapture(fn)
+
+  for i in range(0, 120):
+    cap.read()
+
+  _, frame = cap.read()
+
+  cap.release()
+  pts = markdims.get_limit_points(frame)
+  dst = np.array([[0, 0], [w-1, 0], [w-1, d-1], [0, d-1]], dtype="float32")
+  M = cv2.getPerspectiveTransform(pts, dst)
+
+  cap = cv2.VideoCapture(fn)
+  res = True
+
+  while res:
+    res, frame = cap.read()
+    if not res:
+      break
+
+    img = cv2.warpPerspective(frame, M, (w, d))
+
+    cv2.imshow("warped", img)
+    cv2.imshow("source", frame)
+
+    if cv2.waitKey(1) == 27:
+      break
+    time.sleep(0.05)
+
+  cv2.destroyAllWindows()
+  return M
   
 
