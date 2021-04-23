@@ -12,10 +12,6 @@ from imutils.video import FPS
 logging.basicConfig(format='%(asctime)s  %(levelname)-10s %(message)s', datefmt="%Y-%m-%d-%H-%M-%S",
                     level=logging.INFO)
 
-fn = "kitchen.mp4"
-w = 1400
-h = 1600
-
 if __name__ == '__main__':
   args = cmd_args()
 
@@ -43,7 +39,6 @@ if __name__ == '__main__':
   # each of our dlib correlation trackers, followed by a dictionary to
   # map each unique object ID to a TrackableObject
   centroid_tracker = CentroidTracker(maxDisappeared=40, maxDistance=50)
-  trackers = []
   trackableObjects = dict()
 
   totalFrames = 0
@@ -75,7 +70,7 @@ if __name__ == '__main__':
       
       # we may not be tracking this object yet
       tracked_object = trackableObjects.get(objectID, None)
-      
+
       # we are interested in computations based on our perspective transform
       centroid_transformed = cv2.perspectiveTransform(np.array([centroid]))[0]
 
@@ -85,3 +80,5 @@ if __name__ == '__main__':
         trackableObjects[objectID] = to
       else:
         to.set_distance(centroid_transformed)
+
+    totalFrames += 1
