@@ -20,6 +20,8 @@ import imutils
 import time
 import dlib
 import cv2
+import os
+from args.args import cmd_args
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect
@@ -30,18 +32,16 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
 
 # load our serialized model from disk
 print("[INFO] loading model...")
-net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
+abs_path = os.path.abspath(os.path.dirname(__file__))
 
-# if a video path was not supplied, grab a reference to the webcam
-if not args.get("input", False):
-	print("[INFO] starting video stream...")
-	vs = VideoStream(src=0).start()
-	time.sleep(2.0)
+args = cmd_args()
+proto_path = os.path.join(abs_path, "mobilenet_ssd", "MobileNetSSD_deploy.prototxt")
+model_path = os.path.join(abs_path, "mobilenet_ssd", "MobileNetSSD_deploy.caffemodel")
 
-# otherwise, grab a reference to the video file
-else:
-	print("[INFO] opening video file...")
-	vs = cv2.VideoCapture(args["input"])
+net = cv2.dnn.readNetFromCaffe(proto_path, model_path)
+
+print("[INFO] opening video file...")
+vs = cv2.VideoCapture(args.input)
 
 # initialize the video writer (we'll instantiate later if need be)
 writer = None
@@ -71,12 +71,11 @@ fps = FPS().start()
 while True:
 	# grab the next frame and handle if we are reading from either
 	# VideoCapture or VideoStream
-	frame = vs.read()
-	frame = frame[1] if args.get("input", False) else frame
-
+	res, frame = vs.read()
+	
 	# if we are viewing a video and we did not grab a frame then we
 	# have reached the end of the video
-	if args["input"] is not None and frame is None:
+	if frame is None:
 		break
 
 	# resize the frame to have a maximum width of 500 pixels (the
@@ -89,12 +88,12 @@ while True:
 	if W is None or H is None:
 		(H, W) = frame.shape[:2]
 
-	# if we are supposed to be writing a video to disk, initialize
-	# the writer
-	if args["output"] is not None and writer is None:
-		fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-		writer = cv2.VideoWriter(args["output"], fourcc, 30,
-			(W, H), True)
+	# # if we are supposed to be writing a video to disk, initialize
+	# # the writer
+	# if args.output is not None and writer is None:
+	# 	fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+	# 	writer = cv2.VideoWriter(args["output"], fourcc, 30,
+	# 		(W, H), True)
 
 	# initialize the current status along with our list of bounding
 	# box rectangles returned by either (1) our object detector or
@@ -104,7 +103,7 @@ while True:
 
 	# check to see if we should run a more computationally expensive
 	# object detection method to aid our tracker
-	if totalFrames % args["skip_frames"] == 0:
+	if totalFrames % args.skip_frames == 0:
 		# set the status and initialize our new set of object trackers
 		status = "Detecting"
 		trackers = []
@@ -123,7 +122,7 @@ while True:
 
 			# filter out weak detections by requiring a minimum
 			# confidence
-			if confidence > args["confidence"]:
+			if confidence > args.confidence:
 				# extract the index of the class label from the
 				# detections list
 				idx = int(detections[0, 0, i, 1])
