@@ -8,8 +8,8 @@ import numpy as np
 def cmd_args():
   ap = argparse.ArgumentParser()
 
-  ap.add_argument("-w", "--width", type=float, required=True, help="Width of the viewing area")
-  ap.add_argument("-d", "--depth", type=float, required=True, help="Depth of the viewing area")
+  ap.add_argument("-w", "--width", type=float, required=True, help="Width of the viewing area, ft")
+  ap.add_argument("-d", "--depth", type=float, required=True, help="Depth of the viewing area, ft")
 
   ap.add_argument("-i", "--input", type=str,
     help="path to optional input video file")
@@ -18,4 +18,5 @@ def cmd_args():
   ap.add_argument("-s", "--skip-frames", type=int, default=30,
     help="# of skip frames between detections")
 
+  ap.add_argument("--scale", type=float, default=100, help="Scale the width and height to arrive at the pixel values of coordinates")
   return ap.parse_args()

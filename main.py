@@ -19,14 +19,14 @@ h = 1600
 if __name__ == '__main__':
   args = cmd_args()
 
-  W = args.width
-  H = args.height
+  W = args.width * args.scale
+  H = args.height * args.scale
 
   if W <= 0 or H <=0:
     raise ValueError("Width and height must both be positive")
   
   # matrix to use for all transforms
-  M = markdims.get_perspective_matrix(args.width, args.depth)
+  M = markdims.get_perspective_matrix(W, H)
 
   abs_path = os.path.abspath(os.path.dirname(__file__))
 
@@ -58,13 +58,15 @@ if __name__ == '__main__':
     if not res:
       break
 
-    rects = []
     # time to re-detect!
     if totalFrames % args.skip_frames == 0:
 
       rects = net.step_detector(frame)
     else:
       rects = net.step_tracker(frame)
+
+    if len(rects) == 0:
+      continue
 
     # determine the IDs of objects being tracked
     objects = centroid_tracker.update(rects)
@@ -73,9 +75,13 @@ if __name__ == '__main__':
       
       # we may not be tracking this object yet
       tracked_object = trackableObjects.get(objectID, None)
+      
+      # we are interested in computations based on our perspective transform
+      centroid_transformed = cv2.perspectiveTransform(np.array([centroid]))[0]
 
       if to is None:
-        to = TrackableObject(objectID, centroid)
+
+        to = TrackableObject(objectID, centroid_transformed)
         trackableObjects[objectID] = to
       else:
-        to.set_distance(centroid)
+        to.set_distance(centroid_transformed)
