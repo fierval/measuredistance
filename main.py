@@ -3,12 +3,11 @@ from detections.detector import ObjectDetector
 from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
 import cv2
-import sys, os
+import sys, os, json, time
 import numpy as np
 from args.args import cmd_args
 import logging
 from imutils.video import FPS
-import json
 
 logging.basicConfig(format='%(asctime)s  %(levelname)-10s %(message)s', datefmt="%Y-%m-%d-%H-%M-%S",
                     level=logging.INFO)
@@ -113,6 +112,8 @@ if __name__ == '__main__':
 
     if cv2.waitKey(1) == 27:
       break
+
+    time.sleep(0.1)
 
   cv2.destroyAllWindows()
   

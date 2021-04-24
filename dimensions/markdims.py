@@ -94,7 +94,8 @@ def get_perspective_matrix(source, w, d, limit_pts=None):
 
   cap = cv2.VideoCapture(source)
 
-  for i in range(0, 120):
+  # skip a couple of sec's to arrive at something meaningful
+  for i in range(0, 60):
     cap.read()
 
   _, frame = cap.read()
