@@ -90,5 +90,14 @@ if __name__ == '__main__':
 
       cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
 
-
     totalFrames += 1
+    fps.update()
+    cv2.imshow("Video", frame)
+
+    if cv2.waitKey(1) == 27:
+      break
+
+  cv2.destroyAllWindows()
+  
+  logging.info("Elapsed time: {:.2f}".format(fps.elapsed()))
+  logging.info("FPS: {:.2f}".format(fps.fps()))
