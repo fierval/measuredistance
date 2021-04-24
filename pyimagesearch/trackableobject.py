@@ -21,7 +21,6 @@ class TrackableObject:
     (x1, y1) = pt
     (xc, yc) = self.centroids[-1]
 
-
-    self.distance = np.linalg.norm(pt - self.centroids[-1])
+    self.distance += np.linalg.norm(np.array(pt) - np.array(self.centroids[-1]))
     self.centroids.append(pt)
     
