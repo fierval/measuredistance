@@ -66,6 +66,7 @@ if __name__ == '__main__':
     # determine the IDs of objects being tracked
     objects = centroid_tracker.update(rects)
 
+    # process & draw
     for(objectID, centroid) in objects.items():
       
       # we may not be tracking this object yet
@@ -80,5 +81,14 @@ if __name__ == '__main__':
         trackableObjects[objectID] = to
       else:
         to.set_distance(centroid_transformed)
+
+      # draw both the ID of the object and the centroid of the
+      # object on the output frame
+      text = f"{objectID}: {to.distance / 100 :.2f}"
+      cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
+        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+      cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
+
 
     totalFrames += 1
