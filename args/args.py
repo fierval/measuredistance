@@ -8,8 +8,8 @@ import numpy as np
 def cmd_args():
   ap = argparse.ArgumentParser()
 
-  ap.add_argument("-w", "--width", type=float, required=True, help="Width of the viewing area, ft")
-  ap.add_argument("-d", "--depth", type=float, required=True, help="Depth of the viewing area, ft")
+  ap.add_argument("-w", "--width", type=float, required=True, help="Width of the viewing area, meters")
+  ap.add_argument("-d", "--depth", type=float, required=True, help="Depth of the viewing area, meters")
 
   ap.add_argument("-i", "--input", type=str,
     help="path to optional input video file")

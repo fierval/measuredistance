@@ -74,15 +74,25 @@ def get_limit_points(frame):
   return real_limits
 
 
-def get_perspective_matrix(w, d):
+def get_perspective_matrix(source, w, d, limit_pts=None):
   '''
   Parameters:
+  source - source of video 
   w - width
   d - depth
+  limit_pts - for debugging. A predetermined set of limit points
   Given the width and the depth of the viewing area, get the perspective transform matrix
   '''  
 
-  cap = cv2.VideoCapture(fn)
+  # if we are debugging - no need to get limit points
+  # just compute and return
+  if limit_pts is not None:
+    pts = limit_pts.astype("float32")
+    dst = np.array([[0, 0], [w-1, 0], [w-1, d-1], [0, d-1]], dtype="float32")
+    M = cv2.getPerspectiveTransform(pts, dst)
+    return M
+
+  cap = cv2.VideoCapture(source)
 
   for i in range(0, 120):
     cap.read()
@@ -90,11 +100,12 @@ def get_perspective_matrix(w, d):
   _, frame = cap.read()
 
   cap.release()
-  pts = markdims.get_limit_points(frame)
+  pts = get_limit_points(frame)
   dst = np.array([[0, 0], [w-1, 0], [w-1, d-1], [0, d-1]], dtype="float32")
   M = cv2.getPerspectiveTransform(pts, dst)
 
-  cap = cv2.VideoCapture(fn)
+
+  cap = cv2.VideoCapture(source)
   res = True
 
   while res:
@@ -102,7 +113,7 @@ def get_perspective_matrix(w, d):
     if not res:
       break
 
-    img = cv2.warpPerspective(frame, M, (w, d))
+    img = cv2.warpPerspective(frame, M, (int(w), int(d)))
 
     cv2.imshow("warped", img)
     cv2.imshow("source", frame)

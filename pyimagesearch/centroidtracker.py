@@ -9,7 +9,7 @@ class CentroidTracker:
     # dictionaries used to keep track of mapping a given object
     # ID to its centroid and number of consecutive frames it has
     # been marked as "disappeared", respectively
-    self.nextObjectID = 0
+    self.nextObjectID = 1
     self.objects = OrderedDict()
     self.disappeared = OrderedDict()
 
