@@ -32,11 +32,20 @@ if __name__ == '__main__':
 
   source = try_parse_int(args.input)  
 
+  limit_pts = None
+
   # TODO: debug only limit points
-  limit_pts = np.array([[ 767,  603],
+  # TODO: for den video
+  limit_pts = np.array([[767,  603],
                         [1913,  435],
                         [1907,  887],
                         [478,  987]])
+
+  # TODO for kitchen video
+  # limit_pts = np.array([[ 574.,  241.],
+  #                       [1417.,  279.],
+  #                       [1877.,  957.],
+  #                       [ 130.,  984.]])                        
 
  # matrix to use for all transforms
   M = markdims.get_perspective_matrix(source, W, H, limit_pts=limit_pts)
@@ -64,11 +73,19 @@ if __name__ == '__main__':
   fps = FPS().start()
 
   res = True
+  writer = None
+
   while res:
     res, frame = cap.read()
-    
+
     if not res:
       break
+
+    if args.output is not None and writer is None:
+      fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+      fr_h, fr_w = frame.shape[:2]
+      writer = cv2.VideoWriter(args.output, fourcc, 12,
+        (fr_w, fr_h), True)
 
     # time to re-detect!
     if totalFrames % args.skip_frames == 0:
@@ -93,14 +110,14 @@ if __name__ == '__main__':
 
         if tracked_object is None:
 
-          tracked_object = TrackableObject(objectID, centroid_transformed)
+          tracked_object = TrackableObject(objectID, centroid_transformed, args.scale, args.jitter)
           trackableObjects[objectID] = tracked_object
         else:
           tracked_object.set_distance(centroid_transformed)
 
         # draw both the ID of the object and the centroid of the
         # object on the output frame
-        text = f"{objectID}: {tracked_object.distance / args.scale :.2f}"
+        text = f"{objectID}: {tracked_object.distance :.2f}"
         cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
@@ -108,6 +125,10 @@ if __name__ == '__main__':
 
     totalFrames += 1
     fps.update()
+
+    if writer is not None:
+      writer.write(frame)
+
     cv2.imshow("Video", frame)
 
     if cv2.waitKey(1) == 27:
@@ -115,15 +136,19 @@ if __name__ == '__main__':
 
     time.sleep(0.1)
 
-  cv2.destroyAllWindows()
-  
   fps.stop()
+  cv2.destroyAllWindows()
+  cap.release()
+
+  if writer is not None:
+    writer.release()  
+    
   logging.info("Elapsed time: {:.2f}".format(fps.elapsed()))
   logging.info("FPS: {:.2f}".format(fps.fps()))
 
   res = []
   for (objectID, person) in trackableObjects.items():
-    res += [{"person": objectID, "distance_travelled_meters": round(person.distance / args.scale, 2)}]
+    res += [{"person": objectID, "distance_travelled_meters": round(person.distance, 2)}]
 
   print(json.dumps(res))    
 

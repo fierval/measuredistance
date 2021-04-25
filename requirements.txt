@@ -2,4 +2,4 @@ numpy
 scipy
 imutil
 imutils
-notebook
+dlib==19.17.0
