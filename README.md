@@ -1,6 +1,6 @@
 # Measuring Distance Traveled with Monocular Camera
 
-The camera is watching a space where people are filmed perfroming different tasks, or a file recorded offline from such camera is produced as input. Video frames from the input are sent to an AI pipeline. The pipeline tracks people's movements and measures total distance each one of them travels overtime.
+The camera is watching a space where people are filmed perfroming different tasks, or a file recorded offline from such camera. This is the problem input. Video frames from the input are sent to an AI pipeline. The pipeline tracks people's movements and measures total distance each one of them travels overtime.
 
 ## Assumptioins
 
@@ -44,7 +44,7 @@ The following will launch the test feed:
 python main.py --width 3.72 --depth 2.16 --jitter 0.1 --confidence 0.65 --input "videos/den3.mp4" --test
 ```
 
-See detailed description of the arguments in `args\args.py`
+See detailed description of the arguments in [args\args.py](args/args.py)
 
 This should produce the output:
 
@@ -70,6 +70,10 @@ Initially, we run the object detector to detect objects we need to track (with p
 Detection step is repeated every so often (30 frames by default). We thus hope to increase performance that we save by running correlation tracker in dlib rather than a forward pass through a MobileNet SSD neural net.
 
 The centroid tracker will drop objects it has not seen for a certain amount of time or that have moved too far from the previous centroid.
+
+### Sources
+
+Most of the code for centroid-tracking and object detection is re-used from [Pyimagesearch](https://www.pyimagesearch.com/2018/08/13/opencv-people-counter/)
 
 ### Proposed Metric
 
