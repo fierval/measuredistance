@@ -63,5 +63,16 @@ Initially, we run the object detector to detect objects we need to track (with p
 
 The centroid tracker will drop objects it has not seen for a certain amount of time or that have moved too far from the previous centroid.
 
+### Metric
 
+Given a video of certain length t, the MSE will be computed over a known travel distance for each person in the video. Given a set of such videos of fixed length, mean and standard deviation of these MSE values could be adopted as possible metrics.
+### Testing
 
+The above video is a short clip of me walking the known distance in my living room. Works very well for this short and very deterministic scenario.
+
+### Performance
+
+Current performance on the full HD stream is ~ 8 fps. This can easily be significantly improved on by:
+
+- Using GPU for the object detector. Since I used the "stock" OpenCV instead of building my own for my own GPU, I could not take advantage of the GPU
+- Tracking every single video frame is unnecessary and hurts perfromance. Reducing the load, tracking based on the camera FPS, will improve performance for high-end cameras that stream at 30 or 60 fps, when only every second or every third frame is processed
