@@ -34,20 +34,19 @@ if __name__ == '__main__':
 
   limit_pts = None
 
-  # TODO: debug only limit points
-  # TODO: for den video
-  limit_pts = np.array([[767,  603],
-                        [1913,  435],
-                        [1907,  887],
-                        [478,  987]])
+  if args.test:
+    limit_pts = np.array([[767,  603],
+                          [1913,  435],
+                          [1907,  887],
+                          [478,  987]])
 
-  # TODO for kitchen video
-  # limit_pts = np.array([[ 574.,  241.],
-  #                       [1417.,  279.],
-  #                       [1877.,  957.],
-  #                       [ 130.,  984.]])                        
+    # TODO for kitchen video
+    # limit_pts = np.array([[ 574.,  241.],
+    #                       [1417.,  279.],
+    #                       [1877.,  957.],
+    #                       [ 130.,  984.]])                        
 
- # matrix to use for all transforms
+  # matrix to use for all transforms
   M = markdims.get_perspective_matrix(source, W, H, limit_pts=limit_pts)
 
   abs_path = os.path.abspath(os.path.dirname(__file__))

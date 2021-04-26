@@ -55,7 +55,8 @@ def get_limit_points(frame):
     im = img if len(limits) < 1 else limits[-1]["img"]
 
     cv2.imshow('image', im)
-    if cv2.waitKey(1) == 27:
+    key = cv2.waitKey(1)
+    if key == 13 or key == 10:
       break
 
   cv2.destroyAllWindows()

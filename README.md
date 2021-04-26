@@ -1,1 +1,67 @@
-# measuredistance
+# Measuring Distance Travelled with Monocular Camera
+
+The camera is watching a space with employees perfroming different tasks, or a file recorded off of such camera is produced as input. Video frames from the input are sent to an AI pipeline. The pipeline tracks employee movements and measures total distance travelled overtime.
+## Assumptioins
+
+1. The project is a POC (proof of concept), and **not a production system**. This is a crucial assumption as it allows us to state certain parameters voluntaristically instead of spending time gathering requirements. It is motivated by the complexity of the problem statement vs time available to solve it.
+1. The time during which employees are tracked and the result is produced is determined by the user, but is short as errors accumulate
+1. The dimensions of the space are known in advance (or can be measured)
+
+## Running the App
+
+### Installation
+
+Windows, Linux, or MacOS.
+
+1. Install [Anaconda](https://www.anaconda.com/products/individual).
+1. Change into the root of the solution using command/shell prompt
+
+```sh
+conda create -n ck python=3.6
+conda activate ck
+pip install -r requirements.txt
+```
+### Launching
+
+The following will launch the test feed:
+
+```sh
+python main.py -w=3.72 -d 2.16 -j 0.1 -c 0.65 -i "videos/den3.mp4" --test
+```
+
+See detailed description of the arguments in `args\args.py`
+
+This should produce the output:
+
+```json
+[{"person": 1, "distance_travelled_meters": 4.38}]
+```
+[![Test Distance Measure Video](https://img.youtube.com/vi/6fRGGj58IQo/0.jpg)](https://www.youtube.com/watch?v=6fRGGj58IQo)
+## Design
+
+### The Algorithm
+
+1. Every time period do:
+1. Detect employees using object detector (MobileNet SSD in our case)
+1. While time period not expried, track employees using correlation tracker (dlib).
+1. On every tracking or detection, compute:  
+  a. Centroid from the rectangle of the tracking object  
+  b. Using centroid tracking, find the object in the set of known objects  
+  c. Project the centroid on the plane parallel the "floor" and scaled based on the space dimensions  
+  d. Compute distance travelled between the current and the last known centroid location. Account for "jitter". Accumulate the distance
+1. Stop when user manually stops the app or when the video feed has ended
+
+### Implementation
+
+Before we run the algorithm we first need to establish the projection plane. Once the program is launched, the user is presented with a still image of the space where the plane that corresponds the known dimensions needs to be marked by 4 points.
+
+`LEFT` mouse button selects a point, `RIGHT` button cancels the current selection. Hit `<ENTER>` when done.
+
+The video will play together with the projection, just for visual validation, hit `<ESC>`, to start the program execution.
+
+Initially, we run the object detector to detect objects we need to track (with parameterized confidence) and then the tracker is invoked every frame to track individual object movements. We correlate tracked object centroids from frame to frame and compute distances based on the centroid projections. We only accumulate distances and previous centroids once that distance is greater than "jitter" parameter. This parameter compensates for detected centroid differences that may be due to tracking/detection artifacts while the object is really stationary. 0.1 meters appears to be sufficient. Detection step is repeated every so often (30 frames by default)
+
+The centroid tracker will drop objects it has not seen for a certain amount of time or that have moved too far from the previous centroid.
+
+
+
