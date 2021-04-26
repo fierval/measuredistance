@@ -1,10 +1,11 @@
-# Measuring Distance Travelled with Monocular Camera
+# Measuring Distance Traveled with Monocular Camera
 
-The camera is watching a space with employees perfroming different tasks, or a file recorded off of such camera is produced as input. Video frames from the input are sent to an AI pipeline. The pipeline tracks employee movements and measures total distance travelled overtime.
+The camera is watching a space where people are filmed perfroming different tasks, or a file recorded offline from such camera is produced as input. Video frames from the input are sent to an AI pipeline. The pipeline tracks people's movements and measures total distance each one of them travels overtime.
+
 ## Assumptioins
 
 1. The project is a POC (proof of concept), and **not a production system**. This is a crucial assumption as it allows us to state certain parameters voluntaristically instead of spending time gathering requirements. It is motivated by the complexity of the problem statement vs time available to solve it.
-1. The time during which employees are tracked and the result is produced is determined by the user, but is short as errors accumulate
+1. The time during which employees are tracked and the result is produced, should be short as errors accumulate and we are not dealing with any possible problems here except "jitter" (see below)
 1. The dimensions of the space are known in advance (or can be measured)
 
 ## Running the App
