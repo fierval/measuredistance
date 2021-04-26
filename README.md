@@ -51,6 +51,8 @@ This should produce the output:
 ```json
 [{"person": 1, "distance_travelled_meters": 4.38}]
 ```
+Click to launch the video:  
+
 [![Test Distance Measure Video](https://img.youtube.com/vi/6fRGGj58IQo/0.jpg)](https://www.youtube.com/watch?v=6fRGGj58IQo)
 
 ### Launching a Real Feed
@@ -59,15 +61,17 @@ Before we run the algorithm we first need to establish the projection plane. Onc
 
 `LEFT` mouse button selects a point, `RIGHT` button cancels the current selection. Hit `<ENTER>` when 4 points are selected:
 
+Click to launch the video:  
+
 [![Marking Video](https://img.youtube.com/vi/PjEdOssGne4/0.jpg)](https://www.youtube.com/watch?v=PjEdOssGne4)
 
 The video will play together with the projection, just for visual validation, hit `<ESC>`, to start the program execution.
 
 ### Implementation Notes
 
-Initially, we run the object detector to detect objects we need to track (with parameterized confidence) and then the tracker is invoked every frame to track individual object movements. We correlate tracked object centroids from frame to frame and compute distances based on the centroid projections. We only accumulate distances and previous centroids once that distance is greater than "jitter" parameter. This parameter compensates for detected centroid differences that may be due to tracking/detection artifacts while the object is really stationary. 0.1 meters appears to be sufficient. 
+Initially, we run the object detector to detect objects we need to track (with parameterized confidence) and then the tracker is invoked every frame to track individual object movements. We correlate tracked object centroids from frame to frame and compute distances based on the centroid projections. We only accumulate distances and centroids if the current distance value is greater than the "jitter" parameter. This parameter compensates for detected centroid differences that may be due to tracking/detection artifacts while the object is really stationary. 0.1 meters appears to be sufficient. 
 
-Detection step is repeated every so often (30 frames by default). We thus hope to increase performance that we save by running correlation tracker in dlib rather than a forward pass through a MobileNet SSD neural net.
+Detection step is repeated every so often (30 frames by default). We thus hope to increase performance by running correlation tracker  (using `dlib`) rather than a forward pass through a MobileNet SSD neural net.
 
 The centroid tracker will drop objects it has not seen for a certain amount of time or that have moved too far from the previous centroid.
 
@@ -77,7 +81,7 @@ Most of the code for centroid-tracking and object detection is re-used from [Pyi
 
 ### Proposed Metric
 
-Given a video of certain length _t_, the MSE (Mean Squared Error) will be computed over a known travel distance for each person in the video. Given a set of such videos of fixed length, mean and standard deviation of these MSE values could be adopted as possible metrics.
+Given a video of certain length _t_, the MSE (Mean Squared Error) will be computed over a known travel distance for each person in the video. Given a set of such videos of fixed length, mean and standard deviation of these MSE values could be adopted as a possible metric.
 
 ### Testing
 
@@ -87,5 +91,5 @@ The above video is a short clip of me walking the known distance in my living ro
 
 Current performance on the full HD stream is ~ 8 fps on a Ryzen 7/64 Gb/SSD desktop. This can easily be significantly improved on by:
 
-- Using GPU for the object detector. Since I used the "stock" OpenCV instead of building my own for my own GPU, I could not take advantage of the GPU
-- Tracking every single video frame is unnecessary and hurts perfromance. Reducing the load, tracking based on the camera FPS, will improve performance for high-end cameras that stream at 30 or 60 fps, when only every second or every third frame is processed
+- Using GPU for the object detector. Since I used the "stock" OpenCV instead of building my own for my own GPU, I could not take advantage of the GPU.
+- Tracking every single video frame is unnecessary and hurts perfromance. Reducing the load, tracking based on the camera FPS, will improve performance for high-end cameras that stream at 30 or 60 fps, when only every second or every third frame is processed instead of every frame.
