@@ -61,9 +61,6 @@ Before we run the algorithm we first need to establish the projection plane. Onc
 
 `LEFT` mouse button selects a point, `RIGHT` button cancels the current selection. Hit `<ENTER>` when 4 points are selected:
 
-Click to launch the video:  
-
-[![Marking Video](https://img.youtube.com/vi/PjEdOssGne4/0.jpg)](https://www.youtube.com/watch?v=PjEdOssGne4)
 
 The video will play together with the projection, just for visual validation, hit `<ESC>`, to start the program execution.
 
